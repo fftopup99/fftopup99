@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FF Topup auto Premium</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;font-family:'Segoe UI',sans-serif}
+body{background:#0a0a14;color:#fff;padding-bottom:120px}
+
+.header{background:linear-gradient(135deg,#ff6b00,#ff3d00);padding:18px;text-align:center;box-shadow:0 4px 15px rgba(255,107,0,0.3);position:relative}
+.header h1{font-size:20px;font-weight:bold}
+.user-name{position:absolute;top:10px;left:10px;background:#00e676;color:#000;padding:6px 12px;border-radius:20px;font-size:12px;font-weight:bold}
+
+.tabs{display:flex;background:#0a0a14;padding:12px;gap:8px}
+.tab{flex:1;padding:14px;text-align:center;cursor:pointer;font-weight:bold;font-size:15px;background:linear-gradient(135deg,#1e3a2a,#2d5f3f);border:2px solid #00c853;border-radius:10px;color:#00e676;transition:0.3s}
+.tab.active{background:linear-gradient(135deg,#00c853,#00e676);color:#000;border-color:#00e676}
+
+.actions-bar{background:#0a0a14;padding:10px 15px;display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.balance-btn{background:rgba(255,221,0,0.15);border:1px solid #ffdd00;border-radius:8px;padding:8px 12px;font-size:13px;color:#ffdd00;font-weight:bold;flex:1}
+.addfund-btn{background:linear-gradient(135deg,#00c853,#00e676);border:none;border-radius:8px;padding:8px 12px;font-size:13px;color:#000;font-weight:bold;cursor:pointer;flex:1}
+.order-btn{background:linear-gradient(135deg,#2196F3,#03A9F4);border:none;border-radius:8px;padding:8px 12px;font-size:13px;color:#fff;font-weight:bold;cursor:pointer;flex:1}
+
+.live-order{background:rgba(0,0,0,0.6);border:1px solid #00e676;border-radius:10px;padding:8px 12px;margin:0 15px 15px 15px}
+.live-order .label{font-size:10px;color:#00e676;font-weight:bold;margin-bottom:4px;display:flex;align-items:center;gap:5px}
+.live-scroll{height:22px;overflow:hidden;position:relative}
+.live-item{position:absolute;width:100%;font-size:12px;color:#fff;opacity:0;transition:opacity 0.5s}
+.live-item.active{opacity:1}
+.live-item .name{color:#ffdd00;font-weight:bold}
+.live-item .amt{color:#00e676}
+
+.register-popup{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.95);z-index:9999;display:none;align-items:center;justify-content:center;padding:15px}
+.register-popup.show{display:flex}
+.reg-box{background:#1a1a2e;border:2px solid #00e676;border-radius:16px;padding:25px;width:100%;max-width:350px}
+.reg-box h2{color:#00e676;text-align:center;margin-bottom:15px;font-size:20px}
+.reg-input{width:100%;padding:12px;background:#0a0a14;border:1px solid #333;border-radius:8px;color:white;margin-bottom:12px;font-size:16px}
+.reg-btn{width:100%;padding:14px;background:linear-gradient(135deg,#00c853,#00e676);border:none;border-radius:10px;color:#000;font-weight:bold;font-size:17px;cursor:pointer;margin-top:8px}
+
+.nagad-info{background:#0a0a14;border:2px dashed #00e676;border-radius:10px;padding:12px;margin-bottom:15px;text-align:center}
+.nagad-info .nagad-num{color:#00e676;font-size:18px;font-weight:bold;margin:5px 0}
+.nagad-info p{color:#ccc;font-size:12px;line-height:1.6}
+
+.order-popup{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.95);z-index:9998;display:none;align-items:center;justify-content:center;padding:15px}
+.order-popup.show{display:flex}
+.order-box{background:#1a1a2e;border:2px solid #00e676;border-radius:16px;padding:20px;width:100%;max-width:400px;max-height:80vh;overflow-y:auto}
+.order-box h2{color:#00e676;text-align:center;margin-bottom:15px}
+.order-item{background:#0a0a14;border:1px solid #333;border-radius:10px;padding:12px;margin-bottom:10px}
+.order-item .pkg{color:#ffdd00;font-weight:bold;font-size:15px}
+.order-item .time{font-size:11px;color:#aaa;margin-top:4px}
+.status{margin-top:6px;padding:4px 8px;border-radius:5px;font-size:12px;font-weight:bold;display:inline-block}
+.status.pending{background:#ff9800;color:#000}
+.status.complete{background:#00e676;color:#000}
+
+.packages{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;padding:15px}
+.pkg{background:#1a1a2e;border:2px solid #2a2a3e;border-radius:14px;padding:18px;text-align:center;cursor:pointer;transition:0.3s}
+.pkg:active{transform:scale(0.95)}
+.pkg .dim{font-size:21px;color:#ffdd00;font-weight:bold}
+.pkg .price{margin-top:8px;color:#aaa;font-size:15px}
+.pkg.selected{border:2px solid #00e676;background:rgba(0,230,118,0.1);box-shadow:0 0 15px rgba(0,230,118,0.3)}
+
+.topup-box{display:none;background:#1a1a2e;border:2px solid #00e676;border-radius:16px;padding:22px;margin:15px;box-shadow:0 0 20px rgba(0,230,118,0.2)}
+.topup-box.show{display:block}
+.topup-box h3{color:#00e676;text-align:center;margin-bottom:18px;font-size:18px}
+.input-box{margin-bottom:16px}
+.input-box label{font-size:14px;color:#aaa;display:block;margin-bottom:6px}
+.input-box input{width:100%;padding:13px;background:#0a0a14;border:1px solid #333;border-radius:9px;color:white;font-size:16px}
+
+.payment-info{background:#0a0a14;border:2px dashed #00e676;border-radius:10px;padding:14px;margin-bottom:16px;text-align:center}
+.payment-info .nagad{color:#00e676;font-size:19px;font-weight:bold;margin:6px 0}
+
+.confirm-btn{width:100%;padding:16px;background:linear-gradient(135deg,#25D366,#128C7E);border:none;border-radius:11px;color:white;font-weight:bold;font-size:18px;cursor:pointer}
+
+.support-btn{position:fixed;bottom:20px;left:20px;width:60px;height:60px;border-radius:50%;background:linear-gradient(135deg,#00c853,#00e676);border:none;font-size:26px;color:#000;z-index:999;cursor:pointer}
+.support-text{position:fixed;bottom:85px;left:15px;background:#1a1a2e;color:#00e676;padding:6px 10px;border-radius:6px;font-size:11px;font-weight:bold}
+</style>
+</head>
+<body>
+
+<!-- Register Popup -->
+<div id="registerPopup" class="register-popup">
+<div class="reg-box">
+<h2>👋 Welcome</h2>
+<p style="color:#aaa;text-align:center;margin-bottom:20px;font-size:13px">Register করতে নাম + নাম্বার দাও</p>
+<input type="text" id="regName" class="reg-input" placeholder="তোমার নাম">
+<input type="number" id="regNumber" class="reg-input" placeholder="মোবাইল নাম্বার">
+<button class="reg-btn" onclick="registerUser()">Confirm Register</button>
+</div>
+</div>
+
+<!-- Add Fund Popup -->
+<div id="addFundPopup" class="register-popup">
+<div class="reg-box">
+<h2>💰 Add Fund</h2>
+<div class="nagad-info">
+<p>👇 +8801819811370 নগদ সেন্ড মানি করে 👇</p>
+<div class="nagad-num">+8801819811370</div>
+<p>নিচের Send Money Amount & Last 4 ডিজিট দিয়ে Add করেন 👇👇</p>
+</div>
+<input type="number" id="fundAmount" class="reg-input" placeholder="Amount টাকা">
+<input type="number" id="fundLast4" class="reg-input" placeholder="Last 4 Digit" maxlength="4">
+<button class="reg-btn" onclick="addFund()">Add Balance</button>
+<button style="background:#333;color:#fff" class="reg-btn" onclick="closeAddFund()">Cancel</button>
+</div>
+</div>
+
+<!-- Order History Popup -->
+<div id="orderPopup" class="order-popup">
+<div class="order-box">
+<h2>📦 Your Orders</h2>
+<div id="orderList">
+<p style="color:#666;text-align:center">কোনো অর্ডার নাই</p>
+</div>
+<button style="background:#333;color:#fff;margin-top:15px" class="reg-btn" onclick="closeOrder()">Close</button>
+</div>
+</div>
+
+<div class="header">
+<div class="user-name" id="userName">Guest</div>
+<h1>💎 Free Fire Topup Premium</h1>
+</div>
+
+<div class="tabs">
+<div class="tab active" onclick="showTab('diamond',event)">Diamond</div>
+<div class="tab" onclick="showTab('weekly',event)">Weekly</div>
+<div class="tab" onclick="showTab('monthly',event)">Monthly</div>
+</div>
+
+<div class="actions-bar">
+<button class="balance-btn" id="balanceBtn">৳0 Balance</button>
+<button class="addfund-btn" onclick="openAddFund()">+ Add Fund</button>
+<button class="order-btn" onclick="openOrder()">📦 Your Order</button>
+</div>
+
+<div class="live-order">
+<div class="label">🔴 LIVE ORDERS</div>
+<div class="live-scroll" id="liveScroll"></div>
+</div>
+
+<div id="diamond" class="packages">
+<div class="pkg" onclick="selectPkg(this,'25 Diamond',25)"><div class="dim">💎 25</div><div class="price">৳25</div></div>
+<div class="pkg" onclick="selectPkg(this,'50 Diamond',50)"><div class="dim">💎 50</div><div class="price">৳50</div></div>
+<div class="pkg" onclick="selectPkg(this,'115 Diamond',70)"><div class="dim">💎 115</div><div class="price">৳70</div></div>
+<div class="pkg" onclick="selectPkg(this,'240 Diamond',148)"><div class="dim">💎 240</div><div class="price">৳148</div></div>
+<div class="pkg" onclick="selectPkg(this,'355 Diamond',225)"><div class="dim">💎 355</div><div class="price">৳225</div></div>
+<div class="pkg" onclick="selectPkg(this,'480 Diamond',287)"><div class="dim">💎 480</div><div class="price">৳287</div></div>
+<div class="pkg" onclick="selectPkg(this,'610 Diamond',380)"><div class="dim">💎 610</div><div class="price">৳380</div></div>
+<div class="pkg" onclick="selectPkg(this,'1000 Diamond',695)"><div class="dim">💎 1000</div><div class="price">৳695</div></div>
+<div class="pkg" onclick="selectPkg(this,'2010 Diamond',1300)"><div class="dim">💎 2010</div><div class="price">৳1300</div></div>
+<div class="pkg" onclick="selectPkg(this,'5060 Diamond',3177)"><div class="dim">💎 5060</div><div class="price">৳3177</div></div>
+<div class="pkg" onclick="selectPkg(this,'10100 Diamond',6375)"><div class="dim">💎 10100</div><div class="price">৳6375</div></div>
+</div>
+
+<div id="weekly" class="packages" style="display:none">
+<div class="pkg" onclick="selectPkg(this,'Weekly Lite',42)"><div class="dim">🎫 Weekly Lite</div><div class="price">৳42</div></div>
+<div class="pkg" onclick="selectPkg(this,'Weekly',148)"><div class="dim">🎫 Weekly</div><div class="price">৳148</div></div>
+<div class="pkg" onclick="selectPkg(this,'Weekly x5',735)"><div class="dim">🎫 Weekly x5</div><div class="price">৳735</div></div>
+</div>
+
+<div id="monthly" class="packages" style="display:none">
+<div class="pkg" onclick="selectPkg(this,'Monthly',750)"><div class="dim">📅 Monthly</div><div class="price">৳750</div></div>
+<div class="pkg" onclick="selectPkg(this,'Monthly Plus',1400)"><div class="dim">📅 Monthly Plus</div><div class="price">৳1400</div></div>
+</div>
+
+<div id="topupBox" class="topup-box">
+<h3 id="pkgTitle">Package</h3>
+<div id="uidSection">
+<div class="input-box">
+<label>Free Fire UID</label>
+<input type="number" id="uidInput" placeholder="123456789">
+</div>
+</div>
+<div id="paymentSection">
+<div class="payment-info">
+<p>👇 নগদে Send Money করো</p>
+<div class="nagad">+8801819811370</div>
+<div class="input-box">
+<label>Last 4 Digit</label>
+<input type="number" id="last4Input" placeholder="5678" maxlength="4">
+</div>
+</div>
+</div>
+<button class="confirm-btn" id="confirmBtn" onclick="confirmOrder()">Confirm Order</button>
+</div>
+
+<div class="support-text">Support</div>
+<button class="support-btn" onclick="supportWhatsApp()">💬</button>
+
+<script>
+let selectedPkgName = '';
+let selectedPkgPrice = 0;
+let selectedElement = null;
+let balance = parseInt(localStorage.getItem('ff_balance')) || 0;
+let userName = localStorage.getItem('ff_user') || 'Guest';
+let userNumber = localStorage.getItem('ff_number') || '';
+let orders = JSON.parse(localStorage.getItem('ff_orders')) || [];
+
+window.onload = function(){
+  document.getElementById('userName').innerText = userName;
+  updateBalance();
+  if(!localStorage.getItem('ff_user')){
+    document.getElementById('registerPopup').classList.add('show');
+  }
+  generateLiveOrders();
+  setInterval(showNextLive, 1000);
+  setInterval(generateLiveOrders, 5000);
+}
+
+function registerUser(){
+  let name = document.getElementById('regName').value.trim();
+  let num = document.getElementById('regNumber').value.trim();
+  if(name.length<2){alert('নাম দাও');return}
+  if(num.length<10){alert('নাম্বার দাও');return}
+  localStorage.setItem('ff_user', name);
+  localStorage.setItem('ff_number', num);
+  userName = name;
+  userNumber = num;
+  document.getElementById('userName').innerText = name;
+  document.getElementById('registerPopup').classList.remove('show');
+}
+
+function updateBalance(){
+  document.getElementById('balanceBtn').innerText = '৳' + balance + ' Balance';
+}
+
+function openAddFund(){
+  document.getElementById('addFundPopup').classList.add('show');
+}
+
+function closeAddFund(){
+  document.getElementById('addFundPopup').classList.remove('show');
+}
+
+// Add Fund - ডিরেক্ট WhatsApp ওপেন
+function addFund(){
+  let amt = parseInt(document.getElementById('fundAmount').value);
+  let last4 = document.getElementById('fundLast4').value;
+  if(!amt || amt<1){alert('Amount দাও');return}
+  if(last4.length!=4){alert('Last 4 Digit দাও');return}
+
+  balance += amt;
+  localStorage.setItem('ff_balance', balance);
+  updateBalance();
+  closeAddFund();
+
+  let now = new Date().toLocaleString('bn-BD');
+  let msg = `💰 Add Fund Request\n👤 User: ${userName}\n📱 Number: ${userNumber}\n💵 Amount: ৳${amt}\n🔢 Last 4 Digit: ${last4}\n💰 নতুন Balance: ৳${balance}\n⏰ Time: ${now}\n\nদয়া করে Balance Add করে দিন।`;
+  window.location.href = `https://wa.me/601123192967?text=${encodeURIComponent(msg)}`;
+}
+
+// Order History
+function openOrder(){
+  let list = document.getElementById('orderList');
+  if(orders.length==0){
+    list.innerHTML = '<p style="color:#666;text-align:center">কোনো অর্ডার নাই</p>';
+  } else {
+    list.innerHTML = '';
+    orders.slice().reverse().forEach(o=>{
+      let statusClass = o.status=='pending'? 'pending' : 'complete';
+      let statusText = o.status=='pending'? 'Pending 🔃' : 'Complete ✔️';
+      list.innerHTML += `<div class="order-item">
+        <div class="pkg">${o.pkg} - ৳${o.price}</div>
+        <div style="font-size:13px;margin-top:4px">UID: ${o.uid}</div>
+        <div class="time">${o.time}</div>
+        <span class="status ${statusClass}">${statusText}</span>
+      </div>`;
+    });
+  }
+  document.getElementById('orderPopup').classList.add('show');
+}
+
+function closeOrder(){
+  document.getElementById('orderPopup').classList.remove('show');
+}
+
+function saveOrder(pkg, price, uid){
+  let order = {pkg:pkg, price:price, uid:uid, time:new Date().toLocaleString('bn-BD'), status:'pending'};
+  orders.push(order);
+  localStorage.setItem('ff_orders', JSON.stringify(orders));
+  setTimeout(()=>{
+    order.status = 'complete';
+    localStorage.setItem('ff_orders', JSON.stringify(orders));
+  }, 5000);
+}
+
+function showTab(tab,e){
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  e.target.classList.add('active');
+  document.querySelectorAll('.packages').forEach(p=>p.style.display='none');
+  document.getElementById(tab).style.display='grid';
+  document.getElementById('topupBox').classList.remove('show');
+  if(selectedElement){
+    selectedElement.classList.remove('selected');
+    selectedElement = null;
+  }
+}
+
+function selectPkg(element, name, price){
+  if(selectedElement){
+    selectedElement.classList.remove('selected');
+  }
+  element.classList.add('selected');
+  selectedElement = element;
+
+  selectedPkgName = name;
+  selectedPkgPrice = price;
+  document.getElementById('pkgTitle').innerText = name + ' - ৳' + price;
+  document.getElementById('topupBox').classList.add('show');
+  document.getElementById('uidInput').value = '';
+  document.getElementById('last4Input').value = '';
+
+  if(balance >= price){
+    document.getElementById('paymentSection').style.display = 'none';
+    document.getElementById('confirmBtn').innerText = '৳' + price + ' কেটে Confirm';
+  } else {
+    document.getElementById('paymentSection').style.display = 'block';
+    document.getElementById('confirmBtn').innerText = 'WhatsApp এ Confirm';
+  }
+  document.getElementById('topupBox').scrollIntoView({behavior:'smooth'});
+}
+
+// Order Confirm - ডিরেক্ট WhatsApp ওপেন
+function confirmOrder(){
+  let uid = document.getElementById('uidInput').value;
+  if(uid.length<8){alert('সঠিক UID দাও');return}
+  saveOrder(selectedPkgName, selectedPkgPrice, uid);
+  
+  if(balance >= selectedPkgPrice){
+    balance -= selectedPkgPrice;
+    localStorage.setItem('ff_balance', balance);
+    updateBalance();
+    let msg = `✅ Balance Order\n👤 ${userName}\n📦 ${selectedPkgName}\n৳${selectedPkgPrice}\n🆔 ${uid}\n💵 বাকি: ৳${balance}\n⏰ ${new Date().toLocaleString('bn-BD')}`;
+    window.location.href = `https://wa.me/601123192967?text=${encodeURIComponent(msg)}`;
+  } else {
+    let last4 = document.getElementById('last4Input').value;
+    if(last4.length!=4){alert('Last 4 Digit দাও');return}
+    let msg = `নতুন Order\n👤 ${userName}\n📦 ${selectedPkgName}\n৳${selectedPkgPrice}\n🆔 ${uid}\n🔢 Last4: ${last4}\n⏰ ${new Date().toLocaleString('bn-BD')}`;
+    window.location.href = `https://wa.me/601123192967?text=${encodeURIComponent(msg)}`;
+  }
+  document.getElementById('topupBox').classList.remove('show');
+}
+
+const fakeNames = ['Rahim***','Sakib***','Nayeem***','Farhan***','Tanvir***','Rifat***','Hasan***','Shuvo***'];
+const fakeItems = ['25 Diamond','50 Diamond','115 Diamond','240 Diamond','Weekly','Monthly'];
+let liveIndex = 0;
+
+function generateLiveOrders(){
+  let container = document.getElementById('liveScroll');
+  container.innerHTML = '';
+  for(let i=0;i<8;i++){
+    let name = fakeNames[Math.floor(Math.random()*fakeNames.length)];
+    let item = fakeItems[Math.floor(Math.random()*fakeItems.length)];
+    let div = document.createElement('div');
+    div.className = 'live-item';
+    div.innerHTML = `<span class="name">${name}</span> bought <span class="amt">${item}</span>`;
+    container.appendChild(div);
+  }
+  liveIndex = 0;
+}
+
+function showNextLive(){
+  let items = document.querySelectorAll('.live-item');
+  items.forEach(i=>i.classList.remove('active'));
+  if(items[liveIndex]) items[liveIndex].classList.add('active');
+  liveIndex = (liveIndex + 1) % items.length;
+}
+
+// Support - ডিরেক্ট WhatsApp ওপেন
+function supportWhatsApp(){
+  let msg = `হ্যালো সাপোর্ট\n👤 ${userName}\n💰 Balance: ৳${balance}`;
+  window.location.href = `https://wa.me/601123192967?text=${encodeURIComponent(msg)}`;
+}
+</script>
+</body>
+</html>
